@@ -13,6 +13,9 @@ from tqdm import tqdm
 import logging
 
 # ตั้งค่า logging
+# สร้าง directory ก่อน
+Path('output/validation_reports').mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
