@@ -19,14 +19,21 @@
 
 ## 🚀 การเริ่มต้นใช้งาน
 
-### 1. เตรียมสภาพแวดล้อม
+### 1. เตรียมสภาพแวดล้อมด้วย Virtual Environment
 ```bash
 # Clone โปรเจค
 git clone <repository-url>
 cd paddle_ocr_sagemaker
 
-# เปิด Jupyter Notebook
-jupyter notebook paddle_ocr_training.ipynb
+# รันสคริปต์ตั้งค่าอัตโนมัติ
+./setup.sh          # Linux/macOS
+# หรือ setup.bat     # Windows
+
+# หรือตั้งค่าด้วยตนเอง:
+python3 -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate   # Windows
+pip install -r requirements.txt
 ```
 
 ### 2. เตรียมข้อมูล Text Recognition
@@ -48,6 +55,10 @@ jupyter notebook paddle_ocr_training.ipynb
 - ตั้งค่า checkpoint saving directory สำหรับ Recognition model
 
 ### 4. เริ่มการเทรน Text Recognition
+- เปิดใช้งาน virtual environment: `source venv/bin/activate`
+- เปิด Jupyter Notebook: `jupyter notebook`
+- เลือก kernel "PaddleOCR Recognition" 
+- เปิดไฟล์ `paddle_ocr_recognition_training.ipynb`
 - รันเซลล์ใน notebook ตามลำดับ
 - ตรวจสอบการทำงานของ GPU
 - เริ่มกระบวนการเทรน Recognition โดยใช้ `tools/train_rec.py`
@@ -57,11 +68,22 @@ jupyter notebook paddle_ocr_training.ipynb
 ```
 paddle_ocr_sagemaker/
 ├── README.md
+├── requirements.txt                          # Dependencies สำหรับทั้งโปรเจค
+├── setup.sh / setup.bat                     # สคริปต์ตั้งค่าอัตโนมัติ
+├── .gitignore                               # ไฟล์ที่ไม่ commit (รวม venv/)
+├── venv/                                    # Virtual environment (ไม่ commit)
 ├── paddle_ocr_recognition_training.ipynb     # Notebook หลักสำหรับการเทรน Text Recognition
+├── data_preparation/                        # เครื่องมือเตรียมข้อมูล
+│   ├── README.md
+│   ├── QUICKSTART.md
+│   ├── scripts/                             # ใช้ venv เดียวกันกับ root
+│   ├── input/
+│   └── output/
 ├── .github/
 │   └── copilot-instructions.md               # คำแนะนำสำหรับ GitHub Copilot
 └── docs/
     ├── requirements.md                       # ข้อกำหนดโดยละเอียด
+    ├── virtual-environment.md               # คู่มือ Virtual Environment
     ├── configuration-guide.md                # คู่มือการกำหนดค่า
     ├── data-format.md                       # รูปแบบข้อมูลและ Annotation สำหรับ Recognition
     ├── troubleshooting.md                   # คู่มือแก้ไขปัญหา
@@ -131,10 +153,34 @@ images/word_004.jpg	1234567890
 ## 📚 เอกสารเพิ่มเติม
 
 - [Requirements](docs/requirements.md) - ข้อกำหนดโดยละเอียด
+- [Virtual Environment](docs/virtual-environment.md) - คู่มือการใช้ venv
 - [Configuration Guide](docs/configuration-guide.md) - คู่มือการตั้งค่า
 - [Data Format](docs/data-format.md) - รูปแบบข้อมูลสำหรับ Recognition
 - [Troubleshooting](docs/troubleshooting.md) - แก้ไขปัญหา
 - [Problem Log](docs/problem-log.md) - บันทึกปัญหา
+
+## 🛠️ เครื่องมือเตรียมข้อมูล
+
+สำหรับการเตรียมข้อมูล Recognition:
+```bash
+# เปิดใช้งาน virtual environment
+source venv/bin/activate
+
+# เข้าไปใน data_preparation
+cd data_preparation
+
+# อ่านคู่มือ
+cat README.md
+
+# สร้างข้อมูลทดสอบ
+python scripts/create_demo_data.py
+
+# แปลงข้อมูลจริง
+python scripts/convert_data.py --input-images input/images --input-labels input/labels.txt
+
+# อัปโหลดไปยัง S3
+python scripts/upload_to_s3.py --bucket your-bucket-name
+```
 
 ## 🤝 การสนับสนุน
 

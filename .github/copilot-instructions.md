@@ -19,6 +19,19 @@
 
 ## 🛠️ แนวทางการเขียนโค้ด
 
+### การจัดการ Virtual Environment
+```python
+# ใช้ virtual environment ที่ root ของโปรเจค
+# ตรวจสอบว่าอยู่ใน venv ก่อนเริ่มงาน
+import sys
+if 'venv' not in sys.executable:
+    print("⚠️ Please activate virtual environment: source venv/bin/activate")
+
+# ติดตั้ง dependencies เพิ่มเติม (ถ้าจำเป็น)
+!pip install new-package  # ใน Jupyter
+# หรือ: pip install new-package  # ใน terminal
+```
+
 ### การจัดการ Dependencies
 ```python
 # ใช้ PaddlePaddle GPU version เสมอ
@@ -77,8 +90,19 @@ except Exception as e:
 
 ## 📁 โครงสร้างโค้ดที่แนะนำ
 
+### Virtual Environment Structure
+```
+paddle_ocr_sagemaker/
+├── venv/                        # Virtual environment สำหรับทั้งโปรเจค
+├── requirements.txt             # Dependencies รวม
+├── setup.sh / setup.bat         # สคริปต์ตั้งค่า
+├── data_preparation/            # ใช้ venv เดียวกัน
+│   └── scripts/                 # Python scripts ใช้ venv หลัก
+└── notebook.ipynb               # ใช้ custom kernel จาก venv
+```
+
 ### Notebook Structure
-1. Environment Setup & GPU Check
+1. Virtual Environment & GPU Check
 2. Repository Cloning & Dependencies
 3. S3 Configuration & Data Management
 4. Annotation Validation
@@ -112,12 +136,15 @@ def download_recognition_checkpoints_from_s3()
 - อย่าใช้ local paths แทน S3 paths ในระบบ production
 - อย่าข้าม GPU availability check
 - อย่าเริ่มแก้ปัญหาโดยไม่อ่าน problem-log.md ก่อน
+- อย่าสร้าง virtual environment แยกใน subprojects
+- อย่า commit โฟลเดอร์ venv/ ใน git
 
 ### ⚠️ ระวัง
 - Memory usage เมื่อโหลดข้อมูลขนาดใหญ่
 - S3 download/upload timeouts
 - PaddlePaddle version compatibility
 - CUDA driver compatibility
+- Virtual environment activation ก่อนรัน scripts
 
 ## 🎯 เป้าหมายของโค้ด
 

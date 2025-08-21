@@ -1,0 +1,104 @@
+# ไฟล์และโฟลเดอร์ที่ไม่ต้อง commit ใน git
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Data และ Model files (ขนาดใหญ่)
+*.pdparams
+*.pdopt
+*.pdmodel
+*.pdiparams
+
+# Data preparation outputs
+data_preparation/output/
+data_preparation/input/demo_images/
+data_preparation/input/samples/
+
+# Training outputs
+models/
+checkpoints/
+logs/
+runs/
+
+# AWS credentials (สำคัญมาก - ห้าม commit)
+.aws/
+aws_credentials.txt
+*.pem
+*.key
+
+# IDE และ Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.out
+
+# Large data files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Local configuration
+local_config.py
+config_local.yml
+.env.local
+
+# Cache directories
+.cache/
+.pytest_cache/
+.coverage
+
+# Documentation builds
+docs/_build/

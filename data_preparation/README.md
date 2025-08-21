@@ -17,6 +17,7 @@ data_preparation/
 │   ├── resize_images.py        # ปรับขนาดรูปภาพ
 │   ├── validate_data.py        # ตรวจสอบความถูกต้องของข้อมูล
 │   ├── upload_to_s3.py         # อัปโหลดไปยัง S3
+│   ├── create_demo_data.py     # สร้างข้อมูลทดสอบ
 │   └── utils.py                # ฟังก์ชันสำหรับใช้ร่วมกัน
 ├── input/                      # วางข้อมูลต้นฉบับที่นี่
 │   ├── images/                 # รูปภาพต้นฉบับ
@@ -39,7 +40,12 @@ cp /path/to/your/labels.txt input/
 
 ### ขั้นตอนที่ 2: ติดตั้ง Dependencies
 ```bash
-pip install opencv-python pillow boto3 tqdm
+# เปิดใช้งาน virtual environment ที่ root
+cd ..
+source venv/bin/activate
+cd data_preparation
+
+# Dependencies ถูกติดตั้งจาก root requirements.txt แล้ว
 ```
 
 ### ขั้นตอนที่ 3: แปลงข้อมูล
