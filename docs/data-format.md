@@ -1,156 +1,174 @@
-# รูปแบบข้อมูลและ Annotation (Data Format Guide)
+# รูปแบบข้อมูลสำหรับ Text Recognition (Data Format Guide)
 
-## 📋 รูปแบบไฟล์ Annotation
+## 📋 รูปแบบไฟล์ Annotation สำหรับ Recognition
 
-### รูปแบบมาตรฐานของ PaddleOCR
-ไฟล์ annotation ต้องเป็นไฟล์ text (.txt) โดยแต่ละบรรทัดมีรูปแบบดังนี้:
+### รูปแบบมาตรฐานของ PaddleOCR Recognition
+ไฟล์ annotation สำหรับ Text Recognition ต้องเป็นไฟล์ text (.txt) โดยแต่ละบรรทัดมีรูปแบบดังนี้:
 ```
-image_path\t[{"transcription": "text", "points": [[x1,y1], [x2,y2], [x3,y3], [x4,y4]]}]
-```
-
-### ตัวอย่างไฟล์ Annotation
-```
-images/train_001.jpg	[{"transcription": "สวัสดี", "points": [[100, 50], [200, 50], [200, 80], [100, 80]]}, {"transcription": "ยินดีต้อนรับ", "points": [[100, 90], [250, 90], [250, 120], [100, 120]]}]
-images/train_002.jpg	[{"transcription": "ข้อความทดสอบ", "points": [[50, 30], [300, 30], [300, 60], [50, 60]]}]
-images/train_003.jpg	[{"transcription": "1234567890", "points": [[80, 100], [180, 100], [180, 130], [80, 130]]}]
+image_path\ttext_content
 ```
 
-## 🖼️ รูปแบบรูปภาพที่รองรับ
+**ไม่มีพิกัด (bounding box coordinates) เหมือน Detection**
 
-### ไฟล์รูปภาพ
+### ตัวอย่างไฟล์ Annotation สำหรับ Recognition
+```
+images/word_001.jpg	สวัสดี
+images/word_002.jpg	ยินดีต้อนรับ
+images/word_003.jpg	PaddleOCR
+images/word_004.jpg	1234567890
+images/word_005.jpg	Hello World
+images/word_006.jpg	深度学习
+images/word_007.jpg	Machine Learning
+```
+
+## 🖼️ รูปแบบรูปภาพสำหรับ Recognition
+
+### ไฟล์รูปภาพ (Cropped Text Images)
 - **รูปแบบ**: JPG, JPEG, PNG, TIFF, BMP
-- **ขนาด**: แนะนำความละเอียดระหว่าง 640x480 ถึง 2048x2048 pixels
-- **Aspect Ratio**: ไม่จำกัด แต่แนะนำให้ไม่เกิน 10:1
+- **ขนาด**: แนะนำความกว้าง 100-400 pixels, ความสูง 32-64 pixels
+- **Aspect Ratio**: โดยปกติ 3:1 ถึง 10:1 (กว้างกว่าสูง)
+- **เนื้อหา**: รูปภาพข้อความที่ตัด (cropped) จากรูปภาพต้นฉบับแล้ว
 - **Color Space**: RGB หรือ Grayscale
 
-### แนวทางการเตรียมรูปภาพ
+### แนวทางการเตรียมรูปภาพ Recognition
 ```python
 import cv2
 import numpy as np
 
-def preprocess_image(image_path, target_size=(1024, 1024)):
+def preprocess_recognition_image(image_path, target_height=32):
     """
-    เตรียมรูปภาพสำหรับการเทรน
+    เตรียมรูปภาพสำหรับ Text Recognition
     """
     image = cv2.imread(image_path)
     
-    # ปรับขนาดรูปภาพ
+    # ปรับขนาดให้มีความสูงเท่ากับ target_height
     h, w = image.shape[:2]
-    if max(h, w) > target_size[0]:
-        scale = target_size[0] / max(h, w)
-        new_h, new_w = int(h * scale), int(w * scale)
-        image = cv2.resize(image, (new_w, new_h))
+    aspect_ratio = w / h
+    new_width = int(target_height * aspect_ratio)
     
-    # ปรับปรุงคุณภาพรูปภาพ
-    image = cv2.bilateralFilter(image, 9, 75, 75)
+    # จำกัดความกว้างสูงสุด
+    max_width = 320
+    if new_width > max_width:
+        new_width = max_width
+    
+    image = cv2.resize(image, (new_width, target_height))
     
     return image
 ```
 
-## 📊 โครงสร้างข้อมูล JSON
+## 📊 โครงสร้างข้อมูลสำหรับ Text Recognition
 
-### สำหรับ Text Detection
-```json
-[
-  {
-    "transcription": "ข้อความที่ต้องการ detect",
-    "points": [
-      [x1, y1],  // มุมซ้ายบน
-      [x2, y2],  // มุมขวาบน
-      [x3, y3],  // มุมขวาล่าง
-      [x4, y4]   // มุมซ้ายล่าง
-    ]
-  }
-]
+### รูปแบบ Annotation สำหรับ Recognition
+```
+image_path	text_content
 ```
 
-### คุณสมบัติของพิกัด (Points)
-- **จำนวนจุด**: ต้องมี 4 จุดเสมอ (quadrilateral)
-- **ลำดับจุด**: เรียงตามเข็มนาฬิกา เริ่มจากมุมซ้ายบน
-- **ระบบพิกัด**: (0,0) อยู่ที่มุมซ้ายบนของรูปภาพ
-- **ประเภทข้อมูล**: integer หรือ float
+### คุณสมบัติของข้อมูล Recognition
+- **Image Path**: เส้นทางไปยังรูปภาพข้อความที่ตัดแล้ว (cropped text image)
+- **Text Content**: ข้อความจริงในรูปภาพ (ground truth text)
+- **Separator**: Tab character (\t) เท่านั้น
+- **Encoding**: UTF-8 สำหรับรองรับหลายภาษา
 
-### ตัวอย่างข้อมูล Points
+### ตัวอย่างข้อมูลหลายภาษา
 ```python
-# รูปสี่เหลี่ยมมุมฉาก
-points_rectangle = [[100, 50], [300, 50], [300, 100], [100, 100]]
+# ภาษาไทย
+cropped_images/thai_001.jpg	สวัสดีครับ
+cropped_images/thai_002.jpg	ยินดีต้อนรับ
 
-# รูปสี่เหลี่ยมเอียง
-points_rotated = [[120, 40], [280, 60], [270, 110], [110, 90]]
+# ภาษาอังกฤษ
+cropped_images/eng_001.jpg	Hello World
+cropped_images/eng_002.jpg	PaddleOCR
 
-# ข้อความโค้ง
-points_curved = [[100, 50], [300, 45], [305, 95], [95, 100]]
+# ภาษาจีน
+cropped_images/chi_001.jpg	深度学习
+cropped_images/chi_002.jpg	人工智能
+
+# ตัวเลข
+cropped_images/num_001.jpg	1234567890
+cropped_images/num_002.jpg	2023-08-21
 ```
 
-## 🔧 เครื่องมือสร้าง Annotation
+## 🔧 เครื่องมือสร้าง Annotation สำหรับ Recognition
 
-### 1. การใช้ LabelMe
+### 1. การแปลงจาก Detection เป็น Recognition
 ```python
-def convert_labelme_to_paddleocr(labelme_json_path, image_base_dir):
+def convert_detection_to_recognition(detection_annotation_file, images_dir, output_dir):
     """
-    แปลงไฟล์ LabelMe JSON เป็นรูปแบบ PaddleOCR
+    แปลง Detection annotation เป็น Recognition annotation
+    โดยการตัดรูปภาพตาม bounding box และสร้าง annotation ใหม่
     """
     import json
+    import cv2
+    import os
     
-    with open(labelme_json_path, 'r', encoding='utf-8') as f:
-        labelme_data = json.load(f)
+    recognition_annotations = []
+    os.makedirs(output_dir, exist_ok=True)
     
-    image_path = labelme_data['imagePath']
-    annotations = []
+    with open(detection_annotation_file, 'r', encoding='utf-8') as f:
+        for line_num, line in enumerate(f):
+            line = line.strip()
+            if not line:
+                continue
+            
+            try:
+                image_path, annotation_json = line.split('\t')
+                annotations = json.loads(annotation_json)
+                
+                # โหลดรูปภาพต้นฉบับ
+                full_image_path = os.path.join(images_dir, image_path)
+                image = cv2.imread(full_image_path)
+                
+                if image is None:
+                    continue
+                
+                for idx, ann in enumerate(annotations):
+                    text = ann['transcription']
+                    points = ann['points']
+                    
+                    # ตัดรูปภาพตาม bounding box
+                    cropped = crop_text_region(image, points)
+                    
+                    if cropped is not None:
+                        # บันทึกรูปภาพที่ตัด
+                        crop_filename = f"crop_{line_num:06d}_{idx:03d}.jpg"
+                        crop_path = os.path.join(output_dir, crop_filename)
+                        cv2.imwrite(crop_path, cropped)
+                        
+                        # สร้าง Recognition annotation
+                        recognition_annotations.append(f"{crop_filename}\t{text}")
+                        
+            except Exception as e:
+                print(f"Error processing line {line_num}: {e}")
+                continue
     
-    for shape in labelme_data['shapes']:
-        if shape['shape_type'] == 'polygon' and len(shape['points']) >= 4:
-            annotation = {
-                'transcription': shape['label'],
-                'points': shape['points'][:4]  # ใช้เฉพาะ 4 จุดแรก
-            }
-            annotations.append(annotation)
+    # บันทึกไฟล์ Recognition annotation
+    output_annotation_file = os.path.join(output_dir, 'recognition_annotations.txt')
+    with open(output_annotation_file, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(recognition_annotations))
     
-    # สร้างบรรทัด annotation
-    relative_path = os.path.relpath(image_path, image_base_dir)
-    annotation_line = f"{relative_path}\t{json.dumps(annotations, ensure_ascii=False)}"
-    
-    return annotation_line
-```
+    return output_annotation_file
 
-### 2. การใช้ CVAT (Computer Vision Annotation Tool)
-```python
-def convert_cvat_to_paddleocr(cvat_xml_path):
+def crop_text_region(image, points):
     """
-    แปลงไฟล์ CVAT XML เป็นรูปแบบ PaddleOCR
+    ตัดพื้นที่ข้อความจากรูปภาพ
     """
-    import xml.etree.ElementTree as ET
+    import cv2
+    import numpy as np
     
-    tree = ET.parse(cvat_xml_path)
-    root = tree.getroot()
+    points = np.array(points, dtype=np.int32)
+    x, y, w, h = cv2.boundingRect(points)
     
-    annotations = {}
+    # เพิ่ม padding
+    padding = 5
+    x = max(0, x - padding)
+    y = max(0, y - padding)
+    w = min(image.shape[1] - x, w + 2 * padding)
+    h = min(image.shape[0] - y, h + 2 * padding)
     
-    for image in root.findall('.//image'):
-        image_name = image.get('name')
-        image_annotations = []
-        
-        for polygon in image.findall('.//polygon'):
-            points_str = polygon.get('points')
-            label = polygon.get('label', '')
-            
-            # แปลง points string เป็น list
-            points = []
-            for point_str in points_str.split(';'):
-                x, y = map(float, point_str.split(','))
-                points.append([int(x), int(y)])
-            
-            if len(points) >= 4:
-                annotation = {
-                    'transcription': label,
-                    'points': points[:4]
-                }
-                image_annotations.append(annotation)
-        
-        if image_annotations:
-            annotations[image_name] = image_annotations
+    # ตัดรูปภาพ
+    cropped = image[y:y+h, x:x+w]
     
-    return annotations
+    return cropped if cropped.size > 0 else None
 ```
 
 ## ✅ การตรวจสอบคุณภาพข้อมูล

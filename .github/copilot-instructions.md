@@ -1,12 +1,13 @@
-# GitHub Copilot Instructions สำหรับ PaddleOCR SageMaker Project
+# GitHub Copilot Instructions สำหรับ PaddleOCR Text Recognition SageMaker Project
 
 ## 🎯 บริบทของโปรเจค
 
-โปรเจคนี้เป็นระบบสำหรับเทรน PaddleOCR บน Amazon SageMaker โดยใช้:
-- Official PaddleOCR Repository เป็นหลัก
+โปรเจคนี้เป็นระบบสำหรับเทรน PaddleOCR Text Recognition โมเดลเท่านั้น บน Amazon SageMaker โดยใช้:
+- Official PaddleOCR Repository เป็นหลัก (เฉพาะส่วน Recognition)
 - Amazon S3 สำหรับจัดเก็บข้อมูลและ model checkpoints
 - GPU-enabled SageMaker instances
 - Python 3.8/3.9 compatibility
+- **เฉพาะ Text Recognition training (ไม่รวม Detection)**
 
 ## 📋 กฎการทำงานสำคัญ
 
@@ -39,9 +40,15 @@ config['Train']['dataset']['data_dir'] = s3_data_path
 config['Global']['save_model_dir'] = s3_model_path
 ```
 
-### รูปแบบ Annotation ที่ถูกต้อง
+### รูปแบบ Annotation ที่ถูกต้องสำหรับ Recognition
 ```
-image_path\t[{"transcription": "text", "points": [[x1,y1], [x2,y2], [x3,y3], [x4,y4]]}]
+image_path\ttext_content
+```
+ตัวอย่าง:
+```
+images/word_001.jpg	สวัสดี
+images/word_002.jpg	PaddleOCR
+images/word_003.jpg	1234567890
 ```
 
 ## 🔧 Best Practices
@@ -63,9 +70,10 @@ except Exception as e:
 ```
 
 ### Configuration Management
-- ใช้ไฟล์ .yml จาก PaddleOCR official repo เป็นฐาน
-- แก้ไขเฉพาะส่วนที่จำเป็น (S3 paths, epochs, learning rate)
+- ใช้ไฟล์ .yml จาก PaddleOCR official repo (configs/rec/) เป็นฐาน
+- แก้ไขเฉพาะส่วนที่จำเป็น (S3 paths, epochs, learning rate, character dictionary)
 - สำรองไฟล์ config เดิมก่อนแก้ไข
+- ใช้ CRNN, SVTR หรือ PP-OCRv4 architecture สำหรับ Recognition
 
 ## 📁 โครงสร้างโค้ดที่แนะนำ
 
@@ -81,19 +89,20 @@ except Exception as e:
 
 ### Function Naming Convention
 ```python
-# การจัดการข้อมูล
-def upload_training_data_to_s3()
-def download_data_from_s3()
-def validate_annotation_format()
+# การจัดการข้อมูล Recognition
+def upload_recognition_data_to_s3()
+def download_recognition_data_from_s3()
+def validate_recognition_annotation_format()
+def convert_detection_to_recognition_format()
 
-# การเทรน
-def create_training_config()
-def start_training()
-def monitor_training_progress()
+# การเทรน Recognition
+def create_recognition_training_config()
+def start_recognition_training()
+def monitor_recognition_training_progress()
 
 # การจัดการ checkpoints
-def sync_checkpoints_to_s3()
-def download_checkpoints_from_s3()
+def sync_recognition_checkpoints_to_s3()
+def download_recognition_checkpoints_from_s3()
 ```
 
 ## 🚫 สิ่งที่ควรหลีกเลี่ยง
@@ -113,10 +122,10 @@ def download_checkpoints_from_s3()
 ## 🎯 เป้าหมายของโค้ด
 
 ### Primary Goals
-1. ใช้ Official PaddleOCR training tools
-2. รองรับ S3 data pipeline
-3. GPU-optimized training
-4. Automatic checkpoint management
+1. ใช้ Official PaddleOCR training tools (เฉพาะ Recognition)
+2. รองรับ S3 data pipeline สำหรับ Recognition data
+3. GPU-optimized training สำหรับ Recognition models
+4. Automatic checkpoint management สำหรับ Recognition
 5. Error resilience และ recovery
 
 ### Secondary Goals
