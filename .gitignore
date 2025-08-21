@@ -49,6 +49,7 @@ MANIFEST
 data_preparation/output/
 data_preparation/input/demo_images/
 data_preparation/input/samples/
+data_preparation/input/*
 
 # Training outputs
 models/
@@ -102,3 +103,9 @@ config_local.yml
 
 # Documentation builds
 docs/_build/
+
+# Images and media files
+*.jpg
+*.jpeg
+*.png
+*.gif
