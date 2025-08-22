@@ -238,6 +238,47 @@ EastRandomCropData:
 
 ---
 
+## [2025-08-21] - Upload S3 และ Jupyter Notebook พร้อมใช้งาน
+
+**สรุปผลลัพธ์**: อัปโหลดข้อมูลไปยัง S3 สำเร็จ และอัปเดต Jupyter notebook พร้อมสำหรับการเทรน
+
+**การดำเนินการที่สำเร็จ**:
+1. แก้ไขปัญหา encoding error ใน `upload_to_s3.py` โดยเพิ่ม `--yes` flag
+2. อัปโหลดข้อมูล 5,004 ไฟล์ (3.8MB) ไปยัง S3 bucket `sagemaker-ocr-train-bucket`
+3. อัปเดต Jupyter notebook ทั้ง 12 cells สำคัญ:
+   - Environment setup และ AWS credentials
+   - S3 data configuration
+   - PaddleOCR repository cloning
+   - Training configuration creation
+   - Data download from S3
+   - Training execution with multiple options
+   - Progress monitoring และ S3 upload
+   - Model testing and inference
+
+**ข้อมูลที่อัปโหลดไปยัง S3**:
+- Training images: 4,000 รูปภาพ
+- Validation images: 1,000 รูปภาพ 
+- Annotation files: train_annotation.txt, val_annotation.txt
+- Metadata: character_dict.txt, dataset_info.json
+
+**Jupyter Notebook Features**:
+- ใช้ credentials จาก `aws-config.json` อัตโนมัติ
+- ดาวน์โหลดข้อมูลจาก S3 สำหรับการเทรน
+- สร้าง CRNN configuration สำหรับ Recognition
+- รองรับ training options: Quick demo, Full production, Custom
+- อัปโหลดผลลัพธ์กลับไปยัง S3 อัตโนมัติ
+- ทดสอบโมเดลหลังการเทรน
+
+**ขั้นตอนต่อไป**:
+1. เริ่ม Jupyter notebook: `jupyter notebook paddle_ocr_recognition_training.ipynb`
+2. รัน cells ตามลำดับ
+3. เลือก training option ที่ต้องการ
+4. ติดตามผลการเทรน
+
+**แท็ก**: #s3 #upload #jupyter #notebook #training #ready
+
+---
+
 <!-- 
 เริ่มบันทึกปัญหาใหม่ที่นี่
 ให้ใช้รูปแบบเดียวกับตัวอย่างข้างบน
