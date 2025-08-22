@@ -177,6 +177,39 @@ EastRandomCropData:
 
 ---
 
+## [2025-08-21] - AWS Configuration Setup สำเร็จ
+
+**สรุปผลลัพธ์**: ตั้งค่า AWS configuration สำหรับการเทรน PaddleOCR บน SageMaker สำเร็จแล้ว
+
+**ข้อมูลที่ได้รับจากผู้ใช้**:
+- S3 Bucket: `sagemaker-ocr-train-bucket`
+- AWS Region: `ap-southeast-1`
+- SageMaker Instance: `ml.g4dn.xlarge`
+- AWS Profile: `484468818942_AIEngineer`
+- Credentials: Temporary session token (expires periodically)
+
+**ไฟล์ที่สร้างขึ้น**:
+- `aws-config.json` - Complete AWS configuration (in .gitignore)
+- `.env` - Environment variables file (in .gitignore)
+- `AWS_CONFIG_README.md` - คู่มือการใช้งาน AWS config
+- `test_aws_connection.py` - สคริปต์ทดสอบการเชื่อมต่อ AWS
+
+**การรักษาความปลอดภัย**:
+- เพิ่มไฟล์ credentials ทั้งหมดเข้า `.gitignore`
+- ใช้ temporary session token (ปลอดภัยกว่า permanent keys)
+- สร้างคู่มือการใช้งานและข้อควรระวัง
+
+**ขั้นตอนต่อไป**:
+1. ทดสอบการเชื่อมต่อ: `python test_aws_connection.py`
+2. สร้าง S3 bucket และ upload ข้อมูล
+3. เริ่มการเทรนโมเดลบน SageMaker
+
+**หมายเหตุ**: Session token อาจหมดอายุ ต้องอัปเดตใหม่เป็นระยะ
+
+**แท็ก**: #aws #s3 #sagemaker #credentials #security
+
+---
+
 ## [2025-08-21] - Data Conversion สำเร็จสมบูรณ์
 
 **สรุปผลลัพธ์**: การแปลงข้อมูลจากรูปแบบเดิมเป็น PaddleOCR Recognition format สำเร็จแล้ว

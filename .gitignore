@@ -1,5 +1,14 @@
 # ไฟล์และโฟลเดอร์ที่ไม่ต้อง commit ใน git
 
+# AWS Credentials และ Configuration (SECURITY CRITICAL!)
+aws-config.json
+.env
+.aws/
+*.pem
+*.key
+aws-credentials.*
+config.json
+
 # Virtual Environment
 venv/
 env/

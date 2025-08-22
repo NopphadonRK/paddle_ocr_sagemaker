@@ -41,6 +41,8 @@ def main():
                        help='Skip files that already exist in S3')
     parser.add_argument('--max-files', type=int, default=0,
                        help='Maximum number of files to upload (0 = all)')
+    parser.add_argument('--yes', '-y', action='store_true',
+                       help='Skip confirmation prompt')
     
     args = parser.parse_args()
     
@@ -145,12 +147,24 @@ def main():
         return
     
     # ยืนยันการอัปโหลด
-    print(f"\n⚠️  Ready to upload {len(files_to_upload)} files ({format_size(total_size)}) to S3")
-    response = input("Continue? (y/N): ").strip().lower()
-    
-    if response not in ['y', 'yes']:
-        print("Upload cancelled")
-        return
+    if not args.yes:
+        print(f"\n⚠️  Ready to upload {len(files_to_upload)} files ({format_size(total_size)}) to S3")
+        
+        try:
+            import sys
+            sys.stdout.flush()
+            response = input("Continue? (y/N): ").strip().lower()
+        except (UnicodeDecodeError, EOFError, KeyboardInterrupt):
+            print("\nUpload cancelled")
+            return
+        except Exception as e:
+            print(f"\nInput error: {e}")
+            print("Assuming 'no' - upload cancelled")
+            return
+        
+        if response not in ['y', 'yes']:
+            print("Upload cancelled")
+            return
     
     # เริ่มอัปโหลด
     print(f"\n📤 Starting upload...")

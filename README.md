@@ -73,6 +73,26 @@ cat output/recognition_dataset/metadata/dataset_info.json
   ```
 
 ### 3. การกำหนดค่า
+
+#### 🔐 AWS Configuration (สำเร็จแล้ว!)
+```bash
+# ทดสอบการเชื่อมต่อ AWS
+python test_aws_connection.py
+
+# โหลด environment variables
+source .env
+
+# ตรวจสอบ AWS credentials
+aws sts get-caller-identity
+```
+
+**Configuration Details**:
+- S3 Bucket: `sagemaker-ocr-train-bucket`
+- Region: `ap-southeast-1`  
+- Instance: `ml.g4dn.xlarge`
+- Credentials: Ready (see `AWS_CONFIG_README.md`)
+
+#### 📝 Training Configuration
 - แก้ไข S3 bucket และ path ใน notebook
 - ปรับแต่งพารามิเตอร์การเทรนในไฟล์ `.yml` สำหรับ Recognition
 - ตั้งค่า checkpoint saving directory สำหรับ Recognition model
